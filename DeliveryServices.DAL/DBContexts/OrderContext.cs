@@ -10,7 +10,7 @@ namespace DeliveryServices.DAL.DBContexts
 {
     public class OrderContext: DbContext
     {
-        public OrderContext():base("ConnString")
+        public OrderContext():base("DeliveryServiceConnectionString")
         {
 
         }

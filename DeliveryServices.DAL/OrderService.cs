@@ -3,6 +3,7 @@ using DeliveryServices.DAL.Data;
 using DeliveryServices.DAL.DBContexts;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -40,33 +41,39 @@ namespace DeliveryServices.DAL
 
         public decimal GetOrderPrice(Common.Order order)
         {
-            decimal orderPrice = 0M;
+            SqlParameter orderPrice = new SqlParameter { Value = 0 };
+
             Order o = mapper.Map<Order>(order);
 
             using (var ctx = new OrderContext())
             {
-                Order od = ctx.Orders.Add(o);
-                ctx.SaveChanges();
+                orderPrice = new SqlParameter();
+
+                orderPrice.ParameterName = "@totalcost";
+
+                orderPrice.Direction = ParameterDirection.Output;
+
+                orderPrice.SqlDbType = SqlDbType.Money;
+
+                var res = ctx.Database.ExecuteSqlCommand("usp_GetOrderPrice @distance, @floor, @totalcost OUT",
+                                                                new SqlParameter("@distance", o.Distance),
+                                                                new SqlParameter("@floor", o.FloorNum),
+                                                                orderPrice);
             }
+
+            return Convert.ToDecimal(orderPrice.Value);
+        }
+
+        public bool IsNewCustomer(int customerId)
+        {
+            bool result = false;
 
             using (var ctx = new OrderContext())
             {
-                var distance = new SqlParameter
-                {
-                    ParameterName = "distance",
-                    Value = o.Distance
-                };
-
-                var floor = new SqlParameter
-                {
-                    ParameterName = "floor",
-                    Value = o.FloorNum
-                };
-                
-                orderPrice = Convert.ToDecimal(ctx.Database.SqlQuery<Decimal>("exec usp_GetOrderPrice @distance, @floor", new SqlParameter[] { distance, floor }).ToString());
+                result = ctx.Orders.Any(c => c.CustomerId == customerId);
             }
 
-            return orderPrice;
+            return !result;
         }
     }
 }

@@ -10,13 +10,13 @@ namespace DeliveryServices.Biz
     public class CustomerService
     {
         DAL.CustomerService _customerService;
-        public Customer ValidateCustomer(Customer customer)
+        public int ValidateCustomer(Customer customer)
         {
             _customerService = new DAL.CustomerService();
             return _customerService.ValidateCustomer(customer);
         }
 
-        public Customer SaveCustomer(Customer customer)
+        public int SaveCustomer(Customer customer)
         {
             _customerService = new DAL.CustomerService();
             return _customerService.SaveCustomer(customer);

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
+using System.Web.Http.Cors;
 
 namespace DeliveryServices_Server
 {
@@ -19,10 +20,10 @@ namespace DeliveryServices_Server
 
             // Web API routes
             config.MapHttpAttributeRoutes();
-
+            config.EnableCors(new EnableCorsAttribute(origins: "*", headers: "*", methods: "*"));
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
+                routeTemplate: "api/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
         }

@@ -10,7 +10,7 @@ namespace DeliveryServices.DAL.DBContexts
 {
     public class CustomerContext: DbContext
     {
-        public CustomerContext():base("ZeoConnectionString")
+        public CustomerContext():base("DeliveryServiceConnectionString")
         {
 
         }

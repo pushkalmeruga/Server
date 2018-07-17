@@ -24,29 +24,51 @@ namespace DeliveryServices.DAL
 
             mapper = config.CreateMapper();
         }
-        public Common.Customer ValidateCustomer(Common.Customer customer)
+        public int ValidateCustomer(Common.Customer customer)
         {
+            int customerId = 0;
+
             Customer cust = mapper.Map<Customer>(customer);
 
             using (var ctx = new CustomerContext())
             {
                 Customer cus = ctx.Customers.Where(x => x.Username == cust.Username && x.Password == cust.Password).FirstOrDefault();
+                if (cus != null)
+                    customerId = cus.CustomerId;
             }
 
-            return mapper.Map<Common.Customer>(cust);
+            return customerId;
         }
 
-        public Common.Customer SaveCustomer(Common.Customer customer)
+        public int SaveCustomer(Common.Customer customer)
         {
+            int customerId = 0;
+
             Customer cust = mapper.Map<Customer>(customer);
 
             using (var ctx = new CustomerContext())
             {
-                Customer cus = ctx.Customers.Add(cust);
-                int k = ctx.SaveChanges();
+                if(!ctx.Customers.Any(x => x.Username == cust.Username))
+                {
+                    ctx.Customers.Add(cust);
+                    int result = ctx.SaveChanges();
+
+                    customerId = ctx.Customers.Where(x => x.Username == cust.Username).FirstOrDefault().CustomerId;
+                }                
             }
 
-            return mapper.Map<Common.Customer>(cust);
+            return customerId;
+        }
+
+        public Common.Customer GetCustomer(int customerId)
+        {
+            Common.Customer customer;
+            using (var ctx = new CustomerContext())
+            {
+                customer = mapper.Map<Common.Customer>(ctx.Customers.Where(x => x.CustomerId == customerId).FirstOrDefault());
+            }
+
+            return customer;
         }
 
     }
